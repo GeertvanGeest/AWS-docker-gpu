@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+USAGE="Usage: run_rstudio_server -i <image> -u <user list> -p <admin password>\n
+\n
+This command generates docker containers based on a rstudio server container for each user\n
+\n
+-i image name. If not present yet it will be downloaded from docker hub. Should be based on a jupyter notebook image.\n
+-u user list. Tab delimited list of users with three columns: port, user name, password\n
+-p admin password. Password used for the admin container.
+-m maximum memory for the user container. Default: 16g.\n
+-c maximum number of cpu for the user container. Default: 4."
+
+while getopts ":i:u:p:m:c:" opt
+do
+  case $opt in
+    i)
+      IMAGE=$OPTARG
+      ;;
+    u)
+      USERLIST=$OPTARG
+      ;;
+    p)
+      MASTERPW=$OPTARG
+      ;;
+    m)
+      MEMORY=$OPTARG
+      ;;
+    c)
+      CPU=$OPTARG
+      ;;
+    \?)
+      echo -e "Invalid option: -$OPTARG \n" >&2
+      echo -e $USAGE >&2
+      exit 1
+      ;;
+    :)
+      echo -e "Option -$OPTARG requires an argument. \n"
+      echo -e $USAGE >&2
+      exit 1
+      ;;
+  esac
+done
+
+# return usage if no options are passed
+if [ $OPTIND -eq 1 ]
+then
+  echo -e "No options were passed. \n" >&2
+  echo -e $USAGE >&2
+  exit 1
+fi
+
+# required options
+if [ "$USERLIST" == "" ]; then echo "option -u is missing, but required">&2 && exit 1; fi
+if [ "$MASTERPW" == "" ]; then echo "option -p is missing, but required">&2 && exit 1; fi
+
+# default values
+if [ "$IMAGE" == "" ]; then IMAGE=rocker/rstudio; fi
+if [ "$MEMORY" == "" ]; then MEMORY=16g; fi
+if [ "$CPU" == "" ]; then CPU=4; fi
+
+mkdir -p /data/users/
+mkdir -p /data/group/
+mkdir -p /data/data/
+
+docker run \
+--rm \
+-d \
+-e ROOT=TRUE \
+-p 9000:8787 \
+--name rstudio_admin \
+-e PASSWORD=$MASTERPW \
+--mount type=bind,source=/data,target=/home/rstudio/data \
+$IMAGE
+
+# remove carriage returns and spaces and pipe to while loop
+cat $USERLIST | tr -d '\015\040' | while read port user password
+do
+  # create user volume. If the container crashes the volume keeps existing.
+  # docker volume create $user
+  mkdir -p /data/users/$user
+
+  # generate container for each user
+  # mount user volume, data volume (general, read only) and group work volume (general, read and write)
+  # the permissions of general volumes (data and group work) need to be changed with the master container (this can probably be coded as well)
+
+
+  docker run \
+  -d \
+  --cpus=$CPU \
+  --memory=$MEMORY \
+  --restart=on-failure:10 \
+  -p $port:8787 \
+  --name rstudio_"$user" \
+  -e PASSWORD=$password \
+  -e UMASK=002 \
+  --mount type=bind,source=/data/users/$user,target=/home/rstudio \
+  --mount type=bind,source=/data/data,target=/data,readonly \
+  --mount type=bind,source=/data/group,target=/group_work \
+  $IMAGE
+done
