@@ -61,6 +61,7 @@ if [ "$CPU" == "" ]; then CPU=4; fi
 mkdir -p /data/users/
 mkdir -p /data/group/
 mkdir -p /data/data/
+sudo chgrp -R +1000 /data/
 
 docker run \
 --rm \
@@ -78,6 +79,7 @@ do
   # create user volume. If the container crashes the volume keeps existing.
   # docker volume create $user
   mkdir -p /data/users/$user
+  sudo chgrp -R +1000 /data/users/$user
 
   # generate container for each user
   # mount user volume, data volume (general, read only) and group work volume (general, read and write)
