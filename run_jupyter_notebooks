@@ -72,7 +72,7 @@ docker volume create group
 docker volume create jovyan
 
 docker run \
---rm \
+--restart=unless-stopped \
 -d \
 --name jupyter_admin \
 --mount source=jovyan,target=/home/jovyan \
@@ -104,7 +104,7 @@ do
   -d \
   --cpus=$CPU \
   --memory=$MEMORY \
-  --restart=on-failure:10 \
+  --restart=unless-stopped \
   --name jupyter_"$user" \
   --user root \
   -e NB_USER=$user \
