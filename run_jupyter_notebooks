@@ -72,22 +72,20 @@ docker volume create group
 docker volume create jovyan
 
 docker run \
---rm \
+--restart=unless-stopped \
 -d \
 --name jupyter_admin \
 --mount source=jovyan,target=/home/jovyan \
 --mount source=data,target=/data \
 --mount source=group,target=/group_work \
 --user root \
--e NB_UMASK=002 \
 -e CHOWN_EXTRA="/group_work" \
 -e GRANT_SUDO=yes \
--e JUPYTER_ENABLE_LAB=yes \
 -e JUPYTER_TOKEN=$MASTERPW \
 -p 10000:8888 \
-$IMAGE \
-start-notebook.sh
+$IMAGE
 
+GPUI=1
 # remove carriage returns and spaces and pipe to while loop
 cat $USERLIST | tr -d '\015\040' | while read port user password
 do
@@ -100,26 +98,22 @@ do
   # generate container for each user
   # mount user volume, data volume (general, read only) and group work volume (general, read and write)
   # the permissions of general volumes (data and group work) need to be changed with the master container (this can probably be coded as well)
-  docker run \
+  nvidia-docker run \
   -d \
   --cpus=$CPU \
+  -e NVIDIA_VISIBLE_DEVICES=$GPUI \
   --memory=$MEMORY \
-  --restart=on-failure:10 \
+  --restart=unless-stopped \
   --name jupyter_"$user" \
-  --user root \
-  -e NB_USER=$user \
-  -e NB_UID=1000 \
-  -e NB_UMASK=002 \
-  -w /home/$user \
-  -e CHOWN_HOME=yes \
   --mount source=$user,target=/home/$user \
   --mount source=data,target=/data,readonly \
   --mount source=group,target=/group_work \
-  -e JUPYTER_ENABLE_LAB=yes \
+  -e SHELL=/bin/bash \
   -e JUPYTER_TOKEN=$password \
   -p $port:8888 \
-  $IMAGE \
-  start-notebook.sh
+  $IMAGE
+  
+  ((GPUI=GPUI+1))
 done
 
 # stop all containers:
