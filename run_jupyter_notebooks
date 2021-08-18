@@ -54,7 +54,7 @@ if [ "$USERLIST" == "" ]; then echo "option -u is missing, but required">&2 && e
 if [ "$MASTERPW" == "" ]; then echo "option -p is missing, but required">&2 && exit 1; fi
 
 # default values
-if [ "$IMAGE" == "" ]; then IMAGE=jupyter/base-notebook; fi
+if [ "$IMAGE" == "" ]; then IMAGE=tensorflow/tensorflow:latest-gpu-jupyter; fi
 if [ "$MEMORY" == "" ]; then MEMORY=16g; fi
 if [ "$CPU" == "" ]; then CPU=4; fi
 
