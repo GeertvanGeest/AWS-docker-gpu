@@ -1,12 +1,14 @@
 # AWS-docker
 
 Scripts to employ multiple docker containers simultaneously for teaching. 
-This is a fork of github.com/GeertvanGeest/AWS-docker that enables running containers with a gpu. 
+
+This is a fork of [github.com/GeertvanGeest/AWS-docker](github.com/GeertvanGeest/AWS-docker) which enables running containers with a gpu. 
 
 ## Preparation
 
 Use an AWS deep learning AMI, e.g. [AWS Deep Learning Base AMI](https://aws.amazon.com/marketplace/pp/prodview-dxk3xpeg6znhm?sr=0-1&ref_=beagle&applicationId=AWSMPContessa). These AMI directly support gpu integration.
-Clone this repository:
+
+Clone this repository to the AWS instance:
 
 ```sh
 git clone https://github.com/GeertvanGeest/AWS-docker-gpu.git
