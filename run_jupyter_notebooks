@@ -110,6 +110,7 @@ do
   --mount source=group,target=/group_work \
   -e SHELL=/bin/bash \
   -e JUPYTER_TOKEN=$password \
+  -p $((port-2000)):6006 \
   -p $port:8888 \
   $IMAGE
   

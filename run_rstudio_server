@@ -92,6 +92,7 @@ do
   --restart=unless-stopped \
   -e NVIDIA_VISIBLE_DEVICES=$GPUI \
   -p $port:8787 \
+  -p $((port-2000)):6006 \
   --name rstudio_"$user" \
   -e PASSWORD=$password \
   --mount source=$user,target=/home/rstudio \
