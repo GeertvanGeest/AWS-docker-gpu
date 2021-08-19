@@ -105,7 +105,7 @@ do
   --memory=$MEMORY \
   --restart=unless-stopped \
   --name jupyter_"$user" \
-  --mount source=$user,target=/home/$user \
+  --mount source=$user,target=/home/jupyter \
   --mount source=data,target=/data,readonly \
   --mount source=group,target=/group_work \
   -e SHELL=/bin/bash \
