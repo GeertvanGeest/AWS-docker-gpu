@@ -82,7 +82,7 @@ docker run \
 -e CHOWN_EXTRA="/group_work" \
 -e GRANT_SUDO=yes \
 -e JUPYTER_TOKEN=$MASTERPW \
--p 10000:8888 \
+-p 8000:8888 \
 $IMAGE
 
 GPUI=0
