@@ -16,7 +16,7 @@ git clone https://github.com/GeertvanGeest/AWS-docker-gpu.git
 
 ## Generate credentials
 
-Note that each container gets one GPU assigned. So the number of users should not be more than the number of available GPU!
+Note that one GPU is assigned to each container. So the number of users should not be more than the number of available GPU!
 
 You can generate credentials from a tab-delimited list of users, with four columns: first name, last name, e-mail, instance IP. Here's an example:
 
